@@ -1,3 +1,4 @@
+
 /* eslint-disable react/no-unescaped-entities */
 /* eslint-disable no-unused-vars */
 import React, {useState} from 'react'
@@ -8,23 +9,36 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import './login.css'
 import axios from 'axios'
 
-
-
 function LogIn() {
 
   const history = useNavigate();
 
   const [validated, setValidated] = useState(false);
 
-  const handleSubmit = (event) => {
-    setValidated(false);
+  const handleSubmit = async (event) => {
+    event.preventDefault();
     const form = event.currentTarget;
     if (form.checkValidity() === false) {
-      event.preventDefault();
       event.stopPropagation();
+      setValidated(true);
+      return;
     }
 
-    setValidated(true);
+    const email = form.formBasicEmail.value;
+    const password = form.formBasicPassword.value;
+
+    try {
+      const response = await axios.post('http://localhost:5000/login', { email, password });
+      if (response.status === 200) {
+        localStorage.setItem('token', response.data.accessToken);
+        history('/home');
+      } else {
+        throw new Error('Login failed');
+      }
+    } catch (error) {
+      console.error('Login error:', error);
+      alert('Login failed. Please check your credentials and try again.');
+    }
   };
 
   return (

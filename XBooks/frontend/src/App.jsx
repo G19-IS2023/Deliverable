@@ -17,6 +17,7 @@ function App() {
         <Route path="/register" element={<Register />} />
         <Route path='/books/:id' element={<BookDetails/>}/>
         <Route path='/books/full/:id' element={<FullPage/>}/>
+        <Route path="/fullpage/:query" element={<FullPage />} />
       </Routes>
     </>
   );
