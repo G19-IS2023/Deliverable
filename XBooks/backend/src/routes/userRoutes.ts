@@ -45,7 +45,7 @@ router.post('/login', async(req: Request, res: Response) => {
 
     const searchEmail: string = req.body.email;
 
-    const possibleUser = await db?.collection( 'users' ).findOne({email: searchEmail }) as User | null;
+    const possibleUser = await db?.collection("users").findOne({email: searchEmail }) as User | null;
     
     if(!possibleUser) { 
         return res.status(400).send('Cannot find user');
@@ -70,24 +70,22 @@ router.post('/login', async(req: Request, res: Response) => {
 //API per registrare l'User e criptare la password
 router.post('/register', async (req: Request, res: Response) => {
 
-    try{
-
+    
+    try{ 
         const name: string = req.body.name;
         const email: string = req.body.email;
         const password: string = req.body.password;
         const library: LibraryEntry[] = [];
         const objectId: string = req.body.userId;
-        if(ObjectId.isValid(objectId)) {
+        
+       if(ObjectId.isValid(objectId)) {
             const userId: ObjectId = new ObjectId(objectId);
-
             const salt = await bcrypt.genSalt();
             const hashedPassword = await bcrypt.hash(password, salt) as string;
-
             const user = new User(name, email, hashedPassword, library, userId) as User | null;
-
             if(user) {
             const db = await databaseService.getDb();
-            const result = await db?.collection('users').insertOne(user);
+            const result = await db?.collection("users").insertOne(user);
 
             res.status(201).json(result);
         
@@ -95,11 +93,11 @@ router.post('/register', async (req: Request, res: Response) => {
                 res.status(400).send('User not created');
             }
         } else {
-            res.status(400).send('Invalid user id');
+            res.status(404).send('Invalid user id');
         }
 
     }catch(error: any) {
-        res.status(400).send("Cannot complete the task");
+        res.status(401).send("Cannot complete the task");
     }
 });
 
@@ -115,7 +113,7 @@ router.put('/modifyUsername', async (req: Request, res: Response) => {
             const newUsername: string = req.body.newUsername;
 
             const db = await databaseService.getDb();
-            await db?.collection('users').updateOne({ _id: userId }, { $set: { username: newUsername } });
+            await db?.collection("users").updateOne({ _id: userId }, { $set: { username: newUsername } });
 
             res.status(200).send('Succesfully updated');
         } else {
@@ -140,7 +138,7 @@ router.put('/modifyPassword', async (req: Request, res: Response) => {
 
 
             const db = await databaseService.getDb();
-            const user = await db?.collection('users').findOne({ _id: userId }) as User | null;
+            const user = await db?.collection("users").findOne({ _id: userId }) as User | null;
 
             if(!user) {
                 res.status(401).send('Cannot find the user');
@@ -152,7 +150,7 @@ router.put('/modifyPassword', async (req: Request, res: Response) => {
                 const salt = await bcrypt.genSalt();
                 const hashedPassword = await bcrypt.hash(newPassword, salt);
 
-                await db?.collection('users').updateOne({ _id: userId }, { $set: { password: hashedPassword } });
+                await db?.collection("users").updateOne({ _id: userId }, { $set: { password: hashedPassword } });
                 res.status(200).send('Succesfully updated');
             } else {
 
@@ -177,7 +175,7 @@ router.delete("/deleteProfile/:id", async (req: Request, res: Response) => {
         if(ObjectId.isValid(objectId)) {
             const userId: ObjectId = new ObjectId(objectId);
             const db = await databaseService.getDb();
-            const user = await db?.collection('users').findOne( { _id: userId } ) as User | null;
+            const user = await db?.collection("users").findOne( { _id: userId } ) as User | null;
 
             if(!user) {
                 res.status(401).send('Cannot find user');

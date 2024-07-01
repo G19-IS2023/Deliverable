@@ -11,8 +11,6 @@ import axios from 'axios'
 
 function LogIn() {
 
-  const history = useNavigate();
-
   const [validated, setValidated] = useState(false);
 
   const handleSubmit = async (event) => {
@@ -28,10 +26,17 @@ function LogIn() {
     const password = form.formBasicPassword.value;
 
     try {
+
+      const response = await axios.post('http://localhost:5050/user/login', { email, password });
+      if (response.status === 200) {
+        localStorage.setItem('token', response.data.accessToken);
+        window.location.href = '/home';
+=======
       const response = await axios.post('http://localhost:5000/login', { email, password });
       if (response.status === 200) {
         localStorage.setItem('token', response.data.accessToken);
         history('/home');
+
       } else {
         throw new Error('Login failed');
       }
@@ -72,8 +77,9 @@ function LogIn() {
               <Form.Check className='quicksand-normal' type="checkbox" label="Remember me"/>
             </Form.Group>
             <div className='div-login-button'>
-            <Button type="submit" className='login-button'>
-              <Link to='/home' className='temp'>Log in</Link>
+            <Button type="submit" className='login-button temp'> Log In
+              {//<Link to='/home' className='temp'>Log in</Link>
+}
             </Button>
             <Link className="register-link quicksand-light" to="/register" style={{cursor:"pointer"}}>
             I don't have an account!
