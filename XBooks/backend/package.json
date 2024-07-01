@@ -21,9 +21,7 @@
     "mongoose": "^8.4.4",
     "multer": "^1.4.5-lts.1",
     "nodemon": "^3.1.0",
-    "tsc": "^2.0.4",
-    "tsx": "^4.16.0",
-    "typescript": "^5.5.2"
+    "typescript": "^5.4.5"
   },
   "description": "",
   "devDependencies": {

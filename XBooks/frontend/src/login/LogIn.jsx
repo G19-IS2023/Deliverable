@@ -1,4 +1,3 @@
-
 /* eslint-disable react/no-unescaped-entities */
 /* eslint-disable no-unused-vars */
 import React, {useState} from 'react'
@@ -26,17 +25,10 @@ function LogIn() {
     const password = form.formBasicPassword.value;
 
     try {
-
       const response = await axios.post('http://localhost:5050/user/login', { email, password });
       if (response.status === 200) {
         localStorage.setItem('token', response.data.accessToken);
         window.location.href = '/home';
-=======
-      const response = await axios.post('http://localhost:5000/login', { email, password });
-      if (response.status === 200) {
-        localStorage.setItem('token', response.data.accessToken);
-        history('/home');
-
       } else {
         throw new Error('Login failed');
       }

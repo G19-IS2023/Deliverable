@@ -2,37 +2,17 @@
 import React, { useState } from "react";
 import Navbar from "react-bootstrap/Navbar";
 import Offcanvas from "react-bootstrap/Offcanvas";
-import { Link, useNavigate } from "react-router-dom"; // Import useNavigate
-import "bootstrap/dist/css/bootstrap.min.css";
-import { Col, Row, Form} from "react-bootstrap";
 import "./nav_and_offcanvas.css";
+import { Link } from "react-router-dom";
+import "bootstrap/dist/css/bootstrap.min.css";
+import "./nav_and_offcanvas.css";
+import { Col, Row } from "react-bootstrap";
 
 function NavbarAndOffcanvas() {
   const [show, setShow] = useState(false);
-  const [query, setQuery] = useState(""); // State for search query
-  const navigate = useNavigate(); // Initialize useNavigate
 
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
-
-  const handleSearch = async () => {
-    try {
-      const [response1, response2] = await Promise.all([
-        fetch(`https://example-data.draftbit.com/books?q=${query}`),
-        fetch(`https://example-data.draftbit.com/books?category=${query}`)
-      ]);
-  
-      const data1 = await response1.json();
-      const data2 = await response2.json();
-  
-      let combinedData = []
-      combinedData = [...data1, ...data2];
-  
-      navigate(`/fullpage/${query}`, { state: { books: combinedData, title: `Results for "${query}"` } });
-    } catch (error) {
-      console.error("Error fetching books:", error);
-    }
-  };
 
   return (
     <div>
@@ -123,21 +103,15 @@ function NavbarAndOffcanvas() {
             </Col>
             <Col md={8}>
               <div className="ricerca">
-              <Form className="search-input" onSubmit={(e) => { e.preventDefault(); handleSearch(); }}>
-            <input
-              type="search"
-              placeholder="Search"
-              className="search_input"
-              aria-label="Search"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-            />
-          </Form>
+                <input
+                  type="text"
+                  placeholder="Search"
+                  className="search_input"
+                ></input>
                 <div>
                   <img
                     src="/src/assets/icona_ricerca.png"
                     className="search_icon"
-                    onClick={handleSearch}
                   />
                 </div>
               </div>
