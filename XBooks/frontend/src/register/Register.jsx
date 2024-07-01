@@ -1,3 +1,4 @@
+
 /* eslint-disable react/no-unescaped-entities */
 /* eslint-disable no-unused-vars */
 import React, {useState} from 'react'
@@ -8,30 +9,43 @@ import axios from 'axios';
 import "bootstrap/dist/css/bootstrap.min.css";
 import './register.css'
 
-
 function Register() {
 
-    const [name,setName]=useState();
-    const [email,setEmail]=useState();
-    const [password,setPassword]=useState();
+    const [name,setName]=useState('');
+    const [email,setEmail]=useState('');
+    const [password,setPassword]=useState('');
 
     const [validated, setValidated] = useState(false);
 
-    const handleSubmit = (event,e) => {
-      setValidated(false);
+    const handleSubmit = async (event) => {
+      event.preventDefault();
       const form = event.currentTarget;
       if (form.checkValidity() === false) {
-        event.preventDefault();
         event.stopPropagation();
+        setValidated(true);
+        return;
       }
-  
-      setValidated(true);
-      e.preventDefault();
-      axios.post('', {name,email,password})
-      .then(result => console.log(result))
-      .catch(err=> console.log(err))
+
+      const userData = {
+        name: name,
+        email: email,
+        password: password
+      };
+
+      try {
+        const response = await axios.post('http://localhost:5000/register', userData);
+        if (response.status === 200) {
+          alert('Registration successful! You can now log in.');
+          window.location.href = '/login'; // Make sure the route is correct
+        } else {
+          throw new Error('Registration failed');
+        }
+      } catch (error) {
+        console.error('Registration error:', error);
+        alert('Registration failed. Please check the details and try again.');
+      }
     };
-  
+
     return (
       <div className="sfondo">
         <div className="login">
@@ -60,7 +74,7 @@ function Register() {
                 <Form.Label className="quicksand-normal">Password</Form.Label>
                 <Form.Control required type="password" placeholder="Password" />
                 <Form.Control.Feedback type="invalid">
-                Please choose a valid password.
+                  Please choose a valid password.
                 </Form.Control.Feedback>
               </Form.Group>
               <div className="div-login-button">
