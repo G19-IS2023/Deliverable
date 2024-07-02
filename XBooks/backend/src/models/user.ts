@@ -10,14 +10,14 @@ export default class User {
         public email: string,
         public password: string,
         public library: LibraryEntry[],
-        public id: ObjectId | string
+        public _id: ObjectId
         
     ) {
-        if(this.id && typeof this.id === 'string') {
+        if(this._id && typeof this._id === 'string') {
         
         try {
 
-            this.id = new ObjectId(this.id);
+            this._id = new ObjectId(this._id);
         } catch(error) {
 
             throw new Error('Invalid ID format');

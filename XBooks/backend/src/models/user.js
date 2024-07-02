@@ -2,15 +2,15 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const mongodb_1 = require("mongodb");
 class User {
-    constructor(name, email, password, library, id) {
+    constructor(name, email, password, library, _id) {
         this.name = name;
         this.email = email;
         this.password = password;
         this.library = library;
-        this.id = id;
-        if (this.id && typeof this.id === 'string') {
+        this._id = _id;
+        if (this._id && typeof this._id === 'string') {
             try {
-                this.id = new mongodb_1.ObjectId(this.id);
+                this._id = new mongodb_1.ObjectId(this._id);
             }
             catch (error) {
                 throw new Error('Invalid ID format');

@@ -32,7 +32,7 @@ function getBookfromLibrary(library, libName, bookId) {
     });
 }
 //API per trovare un libro
-router.get("/library/:libName/getBook/:bookId/user/:userId", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.get("/library/:libName/getBook/:bookId/id/:userId", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const libName = req.params.libName;
         const bookId = req.params.bookId;
@@ -64,7 +64,7 @@ router.get("/library/:libName/getBook/:bookId/user/:userId", (req, res) => __awa
     }
 }));
 //API per trovare una specifica libreria
-router.get("/getSpecLibrary/:libName/user/:userId", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.get("/getSpecLibrary/:libName/id/:userId", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const libName = req.params.libName;
         const objectId = req.params.userId;
@@ -97,7 +97,7 @@ router.get("/getSpecLibrary/:libName/user/:userId", (req, res) => __awaiter(void
     }
 }));
 //API per trovare tutte le librerie
-router.get("/getLibrary/:userId", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.get("/getLibraries/:userId", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const objectId = req.params.userId;
         if (mongodb_1.ObjectId.isValid(objectId)) {

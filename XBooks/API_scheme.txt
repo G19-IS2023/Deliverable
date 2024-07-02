@@ -1,0 +1,20 @@
+http://localhost:5050
+
+UserAPI:
+1) GET user = /user/getUser/:userId => userId + token
+2) POST login = /user/login => searchEmail
+3) POST register = /user/register => name, email, password, userId
+4) PUT modifica username = /user/modifyUsername => userId, newUsername + token
+5) PUT modifica password = /user/modifyPassword => userId, oldPassword, newPassword + token
+6) DELETE elimina profilo = /user/deleteProfile/:userId => userId + token
+
+
+BooksAPI:
+1) GET trova specifico libro da libreria = /book/library/:libName/getBook/:bookId/id/:userId => libName, bookId, userId
+2) GET trova specifica libreria = /book/getSpecLibrary/:libName/id/:userId => libName, userId
+3) GET trova tutte le librerie = /book/getLibraries/:userId => userId
+4) PUT modifica numero pagine lette = /book/modifyPages => bookId, libName, pages, userId
+5) POST aggiunge libreria nuova = /book/createLibrary => libName, userId
+6) POST aggiunge libro a una libreria = /book/addBook => bookId, libName, userId
+7) DELETE elimina libro da libreria = /book/library/:libName/deleteBook/:bookId/id/:userId => libName, bookId, userId
+8) DELETE elimina libreria = /book/deleteLibrary/:libName/id/:userId => libName, userId

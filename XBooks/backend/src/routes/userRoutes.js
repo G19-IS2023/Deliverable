@@ -19,26 +19,21 @@ const database_1 = require("../services/database");
 const mongodb_1 = require("mongodb");
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
+const verifyToken_1 = require("./verifyToken");
 const router = express_1.default.Router();
 exports.userRouter = router;
 const databaseService = database_1.DatabaseService.getInstance();
-//API per inviare l'User
-router.get('/getUser/:id', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+//API per inviare l'User e rimetti il token
+router.get('/getUser/:userId', verifyToken_1.verifyToken, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const db = yield databaseService.getDb();
         const objectId = req.params.userId;
-        if (mongodb_1.ObjectId.isValid(objectId)) {
-            const userId = new mongodb_1.ObjectId(objectId);
-            const User = yield (db === null || db === void 0 ? void 0 : db.collection('users').findOne({ _id: userId }));
-            if (User) {
-                res.status(200).json(User);
-            }
-            else {
-                res.status(404).json({ message: 'User not found' });
-            }
+        const user = yield (db === null || db === void 0 ? void 0 : db.collection("users").findOne({ _id: new mongodb_1.ObjectId(objectId) }));
+        if (user) {
+            res.status(200).json(user);
         }
         else {
-            res.status(400).json({ message: 'Invalid id' });
+            res.status(404).send("User not found");
         }
     }
     catch (error) {
@@ -55,8 +50,8 @@ router.post('/login', (req, res) => __awaiter(void 0, void 0, void 0, function* 
     }
     try {
         if (yield bcryptjs_1.default.compare(req.body.password, possibleUser.password)) {
-            const accessToken = jsonwebtoken_1.default.sign({ email: possibleUser.email, _id: possibleUser.id }, process.env.ACCESS_TOKEN_SECRET);
-            res.status(200).json({ accessToken: accessToken });
+            const accessToken = jsonwebtoken_1.default.sign({ email: possibleUser.email, _id: possibleUser._id }, process.env.ACCESS_TOKEN_SECRET);
+            res.status(200).json({ accessToken: accessToken, userId: possibleUser._id });
         }
         else {
             res.status(403).send('Not allowed');
@@ -66,6 +61,7 @@ router.post('/login', (req, res) => __awaiter(void 0, void 0, void 0, function* 
         res.status(500).send('Server error');
     }
 }));
+//controlla se esiste già username e email
 //API per registrare l'User e criptare la password
 router.post('/register', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -79,13 +75,25 @@ router.post('/register', (req, res) => __awaiter(void 0, void 0, void 0, functio
             const salt = yield bcryptjs_1.default.genSalt();
             const hashedPassword = yield bcryptjs_1.default.hash(password, salt);
             const user = new user_1.default(name, email, hashedPassword, library, userId);
-            if (user) {
-                const db = yield databaseService.getDb();
-                const result = yield (db === null || db === void 0 ? void 0 : db.collection("users").insertOne(user));
-                res.status(201).json(result);
+            const db = yield databaseService.getDb();
+            const existEmail = yield (db === null || db === void 0 ? void 0 : db.collection('users').findOne({ email: email }));
+            const existUsername = yield (db === null || db === void 0 ? void 0 : db.collection('users').findOne({ name: name }));
+            if (!existEmail) {
+                if (!existUsername) {
+                    if (user) {
+                        const result = yield (db === null || db === void 0 ? void 0 : db.collection("users").insertOne(user));
+                        res.status(201).json(result);
+                    }
+                    else {
+                        res.status(400).send('User not created');
+                    }
+                }
+                else {
+                    res.status(400).send('Username already exists');
+                }
             }
             else {
-                res.status(400).send('User not created');
+                res.status(409).send('Email already used');
             }
         }
         else {
@@ -96,8 +104,9 @@ router.post('/register', (req, res) => __awaiter(void 0, void 0, void 0, functio
         res.status(401).send("Cannot complete the task");
     }
 }));
+//controlla se esiste già l'username nuovo
 //API per modificare l'username
-router.put('/modifyUsername', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.put('/modifyUsername', verifyToken_1.verifyToken, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const objectId = req.body.userId;
         if (mongodb_1.ObjectId.isValid(objectId)) {
@@ -116,7 +125,7 @@ router.put('/modifyUsername', (req, res) => __awaiter(void 0, void 0, void 0, fu
     }
 }));
 //API per modificare la password
-router.put('/modifyPassword', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.put('/modifyPassword', verifyToken_1.verifyToken, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const objectId = req.body.userId;
         if (mongodb_1.ObjectId.isValid(objectId)) {
@@ -148,23 +157,17 @@ router.put('/modifyPassword', (req, res) => __awaiter(void 0, void 0, void 0, fu
     }
 }));
 //API per eliminare l'account
-router.delete("/deleteProfile/:id", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.delete("/deleteProfile/:userId", verifyToken_1.verifyToken, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const objectId = req.params.userId;
-        if (mongodb_1.ObjectId.isValid(objectId)) {
-            const userId = new mongodb_1.ObjectId(objectId);
-            const db = yield databaseService.getDb();
-            const user = yield (db === null || db === void 0 ? void 0 : db.collection("users").findOne({ _id: userId }));
-            if (!user) {
-                res.status(401).send('Cannot find user');
-                return;
-            }
-            yield (db === null || db === void 0 ? void 0 : db.collection('users').deleteOne({ _id: userId }));
-            res.status(200).send('Succesfully deleted');
+        const db = yield databaseService.getDb();
+        const user = yield (db === null || db === void 0 ? void 0 : db.collection("users").findOne({ _id: new mongodb_1.ObjectId(objectId) }));
+        if (!user) {
+            res.status(401).send('Cannot find user');
+            return;
         }
-        else {
-            res.status(400).send('Invalid user id');
-        }
+        yield (db === null || db === void 0 ? void 0 : db.collection('users').deleteOne({ _id: new mongodb_1.ObjectId(objectId) }));
+        res.status(200).send('Succesfully deleted');
     }
     catch (error) {
         res.status(400).send("Cannot complete the task");

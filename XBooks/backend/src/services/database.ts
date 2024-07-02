@@ -20,8 +20,6 @@ export class DatabaseService {
             if (!process.env.DB_CONN_STRING || !process.env.DB_NAME) {
                 throw new Error('Database connection configuration is missing.');
             }
-            console.log(process.env.DB_CONN_STRING);
-            console.log(process.env.DB_NAME);
             this.client = new MongoClient(process.env.DB_CONN_STRING);
             try {
                 await this.client.connect();
