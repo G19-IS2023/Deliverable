@@ -1,27 +1,24 @@
-/* eslint-disable no-unused-vars */
-import React, { useState, useEffect } from "react";
-import Navbar from "react-bootstrap/Navbar";
-import Offcanvas from "react-bootstrap/Offcanvas";
-import "./nav_and_offcanvas.css";
-import { Link } from "react-router-dom";
-import "bootstrap/dist/css/bootstrap.min.css";
-import "./nav_and_offcanvas.css";
-import { Col, Row } from "react-bootstrap";
+import { useState, useEffect } from 'react';
+import Navbar from 'react-bootstrap/Navbar';
+import Offcanvas from 'react-bootstrap/Offcanvas';
+import { Link } from 'react-router-dom';
+import { Col, Row } from 'react-bootstrap';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import './nav_and_offcanvas.css';
 
 function NavbarAndOffcanvas() {
   const [show, setShow] = useState(false);
   const [user, setUser] = useState({
-    name: "Guest",
-    email: "guest@example.com",
-    profilePicture: "/src/assets/guest.png"
+    name: 'Guest',
+    email: 'guest@example.com',
   });
+  const [userId, setUserId] = useState(localStorage.getItem('userId'));
 
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
 
   useEffect(() => {
     const fetchUserData = async () => {
-      const userId = localStorage.getItem("userId");
       if (userId) {
         try {
           const response = await fetch(`http://localhost:5050/user/getUser/${userId}`);
@@ -32,19 +29,42 @@ function NavbarAndOffcanvas() {
               email: data.email
             });
           } else {
-            console.error("User not found, setting default guest values.");
+            console.error('User not found, setting default guest values.');
+            setUser({
+              name: 'Guest',
+              email: 'guest@example.com'
+            });
           }
         } catch (error) {
-          console.error("Cannot complete the task, setting default guest values.", error);
+          console.error('Cannot complete the task, setting default guest values.', error);
+          setUser({
+            name: 'Guest',
+            email: 'guest@example.com'
+          });
         }
       } else {
-        console.error("No userId found in localStorage, setting default guest values.");
+        console.error('No userId found in localStorage, setting default guest values.');
+        setUser({
+          name: 'Guest',
+          email: 'guest@example.com'
+        });
       }
     };
 
     fetchUserData();
-  }, []);
 
+    const handleStorageChange = (event) => {
+      if (event.key === 'userId') {
+        setUserId(event.newValue);  // Aggiorna userId se cambia nel local storage
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+    };
+  }, [userId]);  // Riesegui l'effect quando userId cambia
   return (
     <div>
       <div>
@@ -54,7 +74,7 @@ function NavbarAndOffcanvas() {
             <div>
               <div className="ppo_container">
                 <img
-                  src={user.profilePicture}
+                  src='/src/assets/guest.png'
                   className="profile_picture_offcanvas"
                   alt="Profile"
                 />
@@ -90,14 +110,14 @@ function NavbarAndOffcanvas() {
                 </Link>
               </div>
               <div>
-                <Link className="box_opzioni2" to="/">
+                <Link className="box_opzioni2" to="/userSettings">
                   <div className="opzione">
                     <hr className="riga" />
                   </div>
                   <div className="preview">
                     <div className="box_opzioni">
                       <img className="icone" alt="icon" />
-                      <h4 className="opzioni">Chat</h4>
+                      <h4 className="opzioni">User settings</h4>
                     </div>
                     <img className="freccia" alt="arrow" />
                   </div>

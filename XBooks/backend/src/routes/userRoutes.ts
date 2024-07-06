@@ -72,7 +72,8 @@ router.post('/register', async (req: Request, res: Response) => {
         const name: string = req.body.name;
         const email: string = req.body.email;
         const password: string = req.body.password;
-        const library: LibraryEntry[] = [];
+        const predLibrary: LibraryEntry = {libName: "Your books", libId: "1", books: []};
+        const library: LibraryEntry[] = [predLibrary]; //Setta libreria predefinita
         const objectId: string = req.body.userId;
         
        if(ObjectId.isValid(objectId)) {

@@ -3,7 +3,6 @@ import "../App";
 import { useParams } from "react-router-dom";
 import axios from "axios";
 import { BOOK_DETAILS_URL } from "../API";
-import NavbarAndOffcanvas from "../components/NavbarAndOffcanvas";
 import ProgressBar from "../components/ProgressBar";
 import "./book_details.css";
 
@@ -68,7 +67,6 @@ function BookDetails() {
 
   return (
     <>
-      <NavbarAndOffcanvas />
       <div className="book-details-2">
       <div className="bd_title_container">
             <h2 className="bd_title">{book?.title}</h2>

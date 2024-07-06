@@ -3,7 +3,6 @@ import { useState, useEffect } from "react";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import { Container } from "react-bootstrap";
-import NavbarAndOffcanvas from "../components/NavbarAndOffcanvas";
 import BookCarosel from "../components/BookCarosel";
 import axios from 'axios'
 import { API_URL } from "../API";
@@ -17,14 +16,12 @@ function Home() {
       axios
         .get(API_URL)
         .then((res) => {
-          console.log(res.data);
           setBooks(res.data);
         })
         .catch((err) => console.log(err));
     }, []);
   return (
     <div className="sfondo_home">
-      <NavbarAndOffcanvas/>
 
       <div className="book_of_the_day_container">
         <h1 className="titolo_bod">Book of the day!</h1>

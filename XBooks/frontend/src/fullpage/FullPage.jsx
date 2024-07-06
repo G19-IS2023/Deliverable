@@ -3,7 +3,6 @@ import { Row, Col, Pagination } from 'react-bootstrap';
 import { useLocation } from 'react-router-dom';
 import BookCard from '../components/BookCard';
 import "./fullpage.css";
-import NavbarAndOffcanvas from '../components/NavbarAndOffcanvas';
 
 function FullPage() {
   const location = useLocation();
@@ -24,7 +23,6 @@ function FullPage() {
 
   return (
     <>
-      <NavbarAndOffcanvas/>
       <Row className='container_titolo_fullpage'>
       <h1 className='titolo_fullpage'>{title}</h1>
       </Row>

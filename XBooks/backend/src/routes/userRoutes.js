@@ -61,14 +61,14 @@ router.post('/login', (req, res) => __awaiter(void 0, void 0, void 0, function* 
         res.status(500).send('Server error');
     }
 }));
-//controlla se esiste già username e email
 //API per registrare l'User e criptare la password
 router.post('/register', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const name = req.body.name;
         const email = req.body.email;
         const password = req.body.password;
-        const library = [];
+        const predLibrary = { libName: "Your books", libId: "1", books: [] };
+        const library = [predLibrary]; //Setta libreria predefinita
         const objectId = req.body.userId;
         if (mongodb_1.ObjectId.isValid(objectId)) {
             const userId = new mongodb_1.ObjectId(objectId);
@@ -104,7 +104,6 @@ router.post('/register', (req, res) => __awaiter(void 0, void 0, void 0, functio
         res.status(401).send("Cannot complete the task");
     }
 }));
-//controlla se esiste già l'username nuovo
 //API per modificare l'username
 router.put('/modifyUsername', verifyToken_1.verifyToken, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -113,8 +112,11 @@ router.put('/modifyUsername', verifyToken_1.verifyToken, (req, res) => __awaiter
             const userId = new mongodb_1.ObjectId(objectId);
             const newUsername = req.body.newUsername;
             const db = yield databaseService.getDb();
-            yield (db === null || db === void 0 ? void 0 : db.collection("users").updateOne({ _id: userId }, { $set: { username: newUsername } }));
-            res.status(200).send('Succesfully updated');
+            const existUsername = yield (db === null || db === void 0 ? void 0 : db.collection('users').findOne({ name: name }));
+            if (!existUsername) {
+                yield (db === null || db === void 0 ? void 0 : db.collection("users").updateOne({ _id: userId }, { $set: { username: newUsername } }));
+                res.status(200).send('Succesfully updated');
+            }
         }
         else {
             res.status(400).send('Invalid ObjectId');

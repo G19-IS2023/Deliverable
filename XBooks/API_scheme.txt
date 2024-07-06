@@ -1,7 +1,7 @@
 http://localhost:5050
 
 UserAPI:
-1) GET user = /user/getUser/:userId => userId + token
+1) GET user = /user/getUser/:userId => userId
 2) POST login = /user/login => searchEmail
 3) POST register = /user/register => name, email, password, userId
 4) PUT modifica username = /user/modifyUsername => userId, newUsername + token

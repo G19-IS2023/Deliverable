@@ -27,8 +27,8 @@ function LogIn() {
     try {
       const response = await axios.post('http://localhost:5050/user/login', { email, password });
       if (response.status === 200) {
-        const { accessToken, userId } = response.data;
-        localStorage.setItem('token', accessToken);
+        const {accesToken, userId} = response.data;
+        localStorage.setItem('token', accesToken);
         localStorage.setItem('userId', userId);  // Salva l'ID utente nel localStorage
         window.location.href = '/home';
       } else {
@@ -72,6 +72,8 @@ function LogIn() {
             </Form.Group>
             <div className='div-login-button'>
             <Button type="submit" className='login-button temp'> Log In
+              {//<Link to='/home' className='temp'>Log in</Link>
+}
             </Button>
             <Link className="register-link quicksand-light" to="/register" style={{cursor:"pointer"}}>
             I don't have an account!
