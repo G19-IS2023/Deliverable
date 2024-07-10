@@ -36,7 +36,7 @@ const LibraryDropdown = ({ bookId }) => {
         return Promise.all(
           libraries.map((library) =>
             fetch(
-              `http://localhost:5050/library/${library.libId}/getBook/${bookId}/id/${userId}`
+              `http://localhost:5050/book/library/${library.libId}/getBook/${bookId}/id/${userId}`
             )
               .then((res) => {
                 // Check the content type of the response
