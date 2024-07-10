@@ -1,32 +1,31 @@
-
 import { useState, useEffect } from "react";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import { Container } from "react-bootstrap";
-import BookCarosel from "../components/BookCarosel";
+import BookCarousel from "../components/BookCarosel"; // Correzione del nome del file importato
 import axios from 'axios'
 import { API_URL } from "../API";
 import "bootstrap/dist/css/bootstrap.min.css";
 import './home.css';
 
 function Home() {
+  const [books, setBooks] = useState([]);
 
-    const [books, setBooks] = useState([]);
-    useEffect(() => {
-      axios
-        .get(API_URL)
-        .then((res) => {
-          setBooks(res.data);
-        })
-        .catch((err) => console.log(err));
-    }, []);
+  useEffect(() => {
+    axios
+      .get(API_URL)
+      .then((res) => {
+        setBooks(res.data);
+      })
+      .catch((err) => console.log(err));
+  }, []);
+
   return (
     <div className="sfondo_home">
-
       <div className="book_of_the_day_container">
         <h1 className="titolo_bod">Book of the day!</h1>
         <div className="book_of_the_day_container_2">
-          <img src="/src/assets/book_cover_test.jpg" className="copertina" />
+          <img src="/src/assets/book_cover_test.jpg" className="copertina" alt="Book Cover"/>
           <div className="book_of_the_day_container_3">
             <h2>Titolooo</h2>
             <p>
@@ -45,21 +44,21 @@ function Home() {
         <Row>
           <Col sm={2} />
           <Col sm={8} className="aggiunti_recente_box">
-          {books.length>0 ? <BookCarosel items={books} sortmethod = {1} category="Fan favorites"/> : null}
+            {books.length > 0 ? <BookCarousel items={books} sortmethod={1} category="Fan favorites"/> : null}
           </Col>
           <Col sm={2} />
         </Row>
         <Row>
           <Col sm={2} />
           <Col sm={8} className="aggiunti_recente_box">
-          {books.length>0 ? <BookCarosel items={books} sortmethod = {2} category="Longest"/> : null}
+            {books.length > 0 ? <BookCarousel items={books} sortmethod={2} category="Longest"/> : null}
           </Col>
           <Col sm={2} />
         </Row>
         <Row>
           <Col sm={2} />
           <Col sm={8} className="aggiunti_recente_box">
-          {books.length>0 ? <BookCarosel items={books} sortmethod = {3} genre="Mystery" category="Mystery"/> : null}
+            {books.length > 0 ? <BookCarousel items={books} sortmethod={3} genre="Mystery" category="Mystery"/> : null}
           </Col>
           <Col sm={2} />
         </Row>

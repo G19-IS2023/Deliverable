@@ -5,6 +5,7 @@ import axios from "axios";
 import { BOOK_DETAILS_URL } from "../API";
 import ProgressBar from "../components/ProgressBar";
 import "./book_details.css";
+import LibraryDropdown from "../components/LibrayDropdown";
 
 function BookDetails() {
   const [book, setBook] = useState({});
@@ -84,6 +85,7 @@ function BookDetails() {
             <p>{book?.authors}</p>
             <h3>Genres</h3>
             <p>{book?.genres}</p>
+            <LibraryDropdown bookId={id}/>
           </div>
           </div>
         </div>

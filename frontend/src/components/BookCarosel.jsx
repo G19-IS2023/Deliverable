@@ -1,18 +1,19 @@
 import { useState, useEffect } from "react";
 import PropTypes from "prop-types";
-import "./book_carosel.css";
+import "./book_carosel.css"; // Correzione del nome del file CSS
 import { useNavigate } from "react-router-dom";
 import BookCard from "./BookCard";
 
-function BookCarosel(props) {
+function BookCarousel(props) {
   const { items, sortmethod, genre, category } = props;
   const [sortedList, setSortedList] = useState([]);
   const [visibleCount, setVisibleCount] = useState(0);
   const cardWidth = 180; // Larghezza minima per ogni card
+  const navigate = useNavigate();
 
   function someFun() {
-    scrollTo({ top, behavior: "smooth" });
-    navigate(`/books/full/${props.category}`, {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+    navigate(`/books/full/${category}`, {
       state: {
         books: sortedList,
         title: category,
@@ -22,12 +23,9 @@ function BookCarosel(props) {
 
   useEffect(() => {
     function handleResize() {
-      const containerWidth =
-        document.getElementById("card-container").clientWidth;
+      const containerWidth = document.getElementById("card-container").clientWidth;
       const newVisibleCount = Math.floor(containerWidth / cardWidth);
-      if(sortedList.length>=newVisibleCount){
-      setVisibleCount(newVisibleCount);
-      }
+      setVisibleCount(Math.min(newVisibleCount, sortedList.length));
     }
     window.addEventListener("resize", handleResize);
     handleResize();
@@ -51,18 +49,17 @@ function BookCarosel(props) {
     }
     setSortedList(list);
   }, [items, sortmethod, genre]);
-  const navigate = useNavigate();
 
   return (
     <div>
       <div
         className="titolo_carousel_container"
         id="card-container"
-        onClick={() => someFun()}
+        onClick={someFun}
       >
-        <h1 className="altro">{props.category}</h1>
+        <h1 className="altro">{category}</h1>
         <h1 className="puntini">.....</h1>
-        <img className="more_icon" />
+        <img className="more_icon" alt="More" />
       </div>
       <hr className="linea_titolo" size="5" />
       <div className="cards_container">
@@ -74,7 +71,7 @@ function BookCarosel(props) {
   );
 }
 
-BookCarosel.propTypes = {
+BookCarousel.propTypes = {
   items: PropTypes.arrayOf(
     PropTypes.shape({
       id: PropTypes.number.isRequired,
@@ -82,6 +79,8 @@ BookCarosel.propTypes = {
       authors: PropTypes.string.isRequired,
       image_url: PropTypes.string.isRequired,
       rating: PropTypes.number.isRequired,
+      num_pages: PropTypes.number,
+      genres: PropTypes.arrayOf(PropTypes.string),
     })
   ).isRequired,
   sortmethod: PropTypes.number,
@@ -89,4 +88,4 @@ BookCarosel.propTypes = {
   genre: PropTypes.string,
 };
 
-export default BookCarosel;
+export default BookCarousel;
