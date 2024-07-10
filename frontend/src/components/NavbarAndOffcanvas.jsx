@@ -96,14 +96,14 @@ function NavbarAndOffcanvas() {
                 </Link>
               </div>
               <div>
-                <Link className="box_opzioni2" to="/">
+                <Link className="box_opzioni2" to="/home">
                   <div className="opzione">
                     <hr className="riga" />
                   </div>
                   <div className="preview">
                     <div className="box_opzioni">
                       <img className="icone" alt="icon" />
-                      <h4 className="opzioni">Wish List</h4>
+                      <h4 className="opzioni">Home</h4>
                     </div>
                     <img className="freccia" alt="arrow" />
                   </div>

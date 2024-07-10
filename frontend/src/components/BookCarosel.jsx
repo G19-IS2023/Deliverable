@@ -63,9 +63,13 @@ function BookCarousel(props) {
       </div>
       <hr className="linea_titolo" size="5" />
       <div className="cards_container">
-        {Array.from({ length: visibleCount }, (_, i) => (
-          <BookCard key={i} book={sortedList[i]} />
-        ))}
+        {sortedList.length === 0 ? (
+          <p>This list is empty!</p>
+        ) : (
+          Array.from({ length: visibleCount }, (_, i) => (
+            sortedList[i] ? <BookCard key={i} book={sortedList[i]} /> : <div key={i} className="empty_card"></div>
+          ))
+        )}
       </div>
     </div>
   );
@@ -80,7 +84,7 @@ BookCarousel.propTypes = {
       image_url: PropTypes.string.isRequired,
       rating: PropTypes.number.isRequired,
       num_pages: PropTypes.number,
-      genres: PropTypes.arrayOf(PropTypes.string),
+      genres: PropTypes.string,
     })
   ).isRequired,
   sortmethod: PropTypes.number,

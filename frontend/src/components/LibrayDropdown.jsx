@@ -36,7 +36,7 @@ const LibraryDropdown = ({ bookId }) => {
         return Promise.all(
           libraries.map((library) =>
             fetch(
-              `http://localhost:5050/book/library/${library.libId}/getBook/${bookId}/id/${userId}`
+              `http://localhost:5050/book/library/${library.libId}/id/${userId}/getBook/${bookId}`
             )
               .then((res) => {
                 // Check the content type of the response
@@ -50,10 +50,7 @@ const LibraryDropdown = ({ bookId }) => {
                 }
               })
               .then((resData) => {
-                if (
-                  Array.isArray(resData) &&
-                  resData.some((book) => book.bookId === bookId)
-                ) {
+                if (resData.result === true) {
                   setBookInLibraries((prevState) => ({
                     ...prevState,
                     [library.libId]: true,
