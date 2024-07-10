@@ -5,7 +5,7 @@ import { ObjectId } from 'mongodb';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
 import LibraryEntry from '../models/library';
-import { verifyToken } from '../services/script';
+import { validateEmail, validatePassword, verifyToken } from '../services/script';
 
 const router = express.Router();
 
@@ -29,7 +29,8 @@ router.get('/getUser/:userId', async(req: Request, res: Response) => {
         }
 
     }catch(error: any) {
-        res.status(400).send("Cannot complete the task");
+
+        res.status(500).send("Unable to find the user, try again");
     }
     
 });
@@ -38,17 +39,17 @@ router.get('/getUser/:userId', async(req: Request, res: Response) => {
 //API per verificare le credenziali e inviare l'accessToken
 router.post('/login', async(req: Request, res: Response) => {
 
-    const db = await databaseService.getDb();
-
-    const searchEmail: string = req.body.email;
-
-    const possibleUser = await db?.collection("users").findOne({email: searchEmail }) as User | null;
+    try{
     
-    if(!possibleUser) { 
-        return res.status(404).send('Cannot find user');
-    }
+        const db = await databaseService.getDb();
 
-    try {
+        const searchEmail: string = req.body.email;
+
+        const possibleUser = await db?.collection("users").findOne({email: searchEmail }) as User | null;
+        
+        if(!possibleUser) { 
+            return res.status(404).send('Cannot find user');
+        }
 
         if(await bcrypt.compare(req.body.password, possibleUser.password)) {
 
@@ -56,14 +57,14 @@ router.post('/login', async(req: Request, res: Response) => {
 
             res.set('Authorization', `Bearer ${accessToken}`);
             res.status(200).json({ userId: possibleUser._id });
-            console.log(accessToken + " " + possibleUser._id);
 
         } else {
             
-            res.status(403).send('Wrong password');
+            res.status(401).send('Wrong password');
         }
     } catch (error: any) {
-        res.status(500).send('Server error');
+
+        res.status(500).send('Unable to login, try again');
     }
 });
 
@@ -71,8 +72,8 @@ router.post('/login', async(req: Request, res: Response) => {
 //API per registrare l'User e criptare la password
 router.post('/register', async (req: Request, res: Response) => {
 
-    
     try{ 
+
         const name: string = req.body.name;
         const email: string = req.body.email;
         const password: string = req.body.password;
@@ -81,40 +82,53 @@ router.post('/register', async (req: Request, res: Response) => {
         const objectId: string = req.body.userId;
         
        if(ObjectId.isValid(objectId)) {
-        
-            const userId: ObjectId = new ObjectId(objectId);
-            const salt = await bcrypt.genSalt();
-            const hashedPassword = await bcrypt.hash(password, salt) as string;
-            const user = new User(name, email, hashedPassword, library, userId) as User | null;
-            
-            const db = await databaseService.getDb();
 
-            const existEmail = await db?.collection('users').findOne({ email: email  }) as User | null;
-            const existUsername = await db?.collection('users').findOne({ name: name  }) as User | null;
+            if(validateEmail(email)) {
+                
+                if(validatePassword(password, req, res)) {
 
-            if(!existEmail) {
-                if(!existUsername) {
+                    const userId: ObjectId = new ObjectId(objectId);
+                    const salt = await bcrypt.genSalt();
+                    const hashedPassword = await bcrypt.hash(password, salt) as string;
+                    const user = new User(name, email, hashedPassword, library, userId) as User | null;
                     
-                    if(user) {
-                    const result = await db?.collection("users").insertOne(user);
+                    const db = await databaseService.getDb();
 
-                    res.status(201).json(result);
+                    const existEmail = await db?.collection('users').findOne({ email: email  }) as User | null;
+                    const existUsername = await db?.collection('users').findOne({ name: name  }) as User | null;
 
+                    if(!existEmail) {
+                        if(!existUsername) {
+
+                            if(user) {
+                            const result = await db?.collection("users").insertOne(user);
+
+                            res.status(201).json(result);
+
+                            } else {
+                                res.status(500).send('User not created due to a database problem');
+                            }
+                        } else { 
+                            res.status(409).send('Username already exists');
+                        }
                     } else {
-                        res.status(400).send('User not created');
+                        res.status(409).send('Email already used');
                     }
-                } else { 
-                    res.status(400).send('Username already exists');
+                } else {
+                    res.status(401).send('Password not valid');
                 }
+                
             } else {
-                res.status(409).send('Email already used');
+                res.status(406).send('Invalid email');
             }
+    
         } else {
-            res.status(404).send('Invalid user id');
+            res.status(406).send('Invalid user id');
         }
 
     }catch(error: any) {
-        res.status(401).send("Cannot complete the task");
+
+        res.status(500).send("Unable to register the user, try again");
     }
 });
 
@@ -135,10 +149,14 @@ router.put('/modifyUsername', verifyToken, async (req: Request, res: Response) =
 
             await db?.collection('users').updateOne({ _id: new ObjectId(userId) }, { $set: { name: newUsername } });
             res.status(200).send('Succesfully updated');
+        } else {
+
+            res.status(409).send("Username already exist");
         }
             
     } catch(error: any) {
-        res.status(400).send("Cannot complete the task");
+
+        res.status(500).send("Unable to update the username, try again");
     }
 });
 
@@ -147,30 +165,41 @@ router.put('/modifyUsername', verifyToken, async (req: Request, res: Response) =
 router.put('/modifyPassword', verifyToken, async (req: Request, res: Response) => {
 
     try {
+
         const userId: string = req.body.userId;
         const oldPassword: string = req.body.oldPassword;
+        
         const newPassword: string = req.body.newPassword;
 
         const db = await databaseService.getDb();
         const user = await db?.collection("users").findOne({ _id: new ObjectId(userId) }) as User | null;
 
         if(!user) {
-            res.status(401).send('Cannot find the user');
-            return;
-        }
-        if(await bcrypt.compare(oldPassword, user.password)) {
+            res.status(404).send('Cannot find the user');
+        } else {
+            if(validatePassword(newPassword, req, res)) {
 
-            const salt = await bcrypt.genSalt();
-            const hashedPassword = await bcrypt.hash(newPassword, salt);
-            await db?.collection("users").updateOne({ _id: new ObjectId(userId) }, { $set: { password: hashedPassword } });
-            res.status(200).send('Succesfully updated');
+                if(await bcrypt.compare(oldPassword, user!.password)) {
+
+                    const salt = await bcrypt.genSalt();
+                    const hashedPassword = await bcrypt.hash(newPassword, salt);
+
+                    await db?.collection("users").updateOne({ _id: new ObjectId(userId) }, { $set: { password: hashedPassword } });
+
+                    res.status(200).send('Succesfully updated');
+                } else {
+                    
+                    res.status(401).send('Old password is incorrect');
+                }
+
             } else {
-
-                res.status(403).send('Old password is incorrect');
+                res.status(406).send('New password is not valid');
             }
+        }
 
     } catch(error: any) {
-        res.status(400).send("Cannot complete the task");
+
+        res.status(500).send("Unable to update the password, try again");
     }
 });
 
@@ -186,16 +215,17 @@ router.delete("/deleteProfile/:userId", verifyToken, async (req: Request, res: R
         const user = await db?.collection("users").findOne( { _id: new ObjectId(userId) } ) as User | null;
 
         if(!user) {
-            res.status(401).send('Cannot find user');
+            res.status(404).send('Cannot find user');
             return;
-        }
+        } else {
 
-        await db?.collection('users').deleteOne({ _id: new ObjectId(userId) });
-        res.status(200).send('Succesfully deleted');
+            await db?.collection('users').deleteOne({ _id: new ObjectId(userId) });
+            res.status(200).send('Succesfully deleted');
+        }
 
     } catch(error: any) {
 
-        res.status(400).send("Cannot complete the task");
+        res.status(500).send("Unable to delete the account, try again");
     }
 });
 
