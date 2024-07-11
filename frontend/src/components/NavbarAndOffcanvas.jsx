@@ -65,6 +65,12 @@ function NavbarAndOffcanvas() {
       window.removeEventListener('storage', handleStorageChange);
     };
   }, [userId]);  // Riesegui l'effect quando userId cambia
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('userId');
+  };
+
   return (
     <div>
       <div>
@@ -110,7 +116,7 @@ function NavbarAndOffcanvas() {
                 </Link>
               </div>
               <div>
-                <Link className="box_opzioni2" to="/userSettings">
+                <Link className="box_opzioni2" to="/userSettings" user={user}>
                   <div className="opzione">
                     <hr className="riga" />
                   </div>
@@ -124,7 +130,7 @@ function NavbarAndOffcanvas() {
                 </Link>
               </div>
               <div>
-                <Link className="box_opzioni2" to="/">
+                <Link className="box_opzioni2" to="/" onClick={handleLogout}>
                   <div className="opzione">
                     <hr className="riga" />
                   </div>

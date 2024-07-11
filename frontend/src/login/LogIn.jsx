@@ -68,13 +68,8 @@ function LogIn() {
               Please choose a valid password.
               </Form.Control.Feedback>
             </Form.Group>
-            <Form.Group className="mb-3" controlId="formBasicCheckbox">
-              <Form.Check className='quicksand-normal' type="checkbox" label="Remember me"/>
-            </Form.Group>
             <div className='div-login-button'>
             <Button type="submit" className='login-button temp'> Log In
-              {//<Link to='/home' className='temp'>Log in</Link>
-}
             </Button>
             <Link className="register-link quicksand-light" to="/register" style={{cursor:"pointer"}}>
             I don't have an account!
