@@ -77,12 +77,12 @@ router.post('/register', (req, res) => __awaiter(void 0, void 0, void 0, functio
                     const userId = new mongodb_1.ObjectId(objectId);
                     const salt = yield bcryptjs_1.default.genSalt();
                     const hashedPassword = yield bcryptjs_1.default.hash(password, salt);
-                    const user = new user_1.default(name, email, hashedPassword, library, userId);
                     const db = yield databaseService.getDb();
                     const existEmail = yield (db === null || db === void 0 ? void 0 : db.collection('users').findOne({ email: email }));
                     const existUsername = yield (db === null || db === void 0 ? void 0 : db.collection('users').findOne({ name: name }));
                     if (!existEmail) {
                         if (!existUsername) {
+                            const user = new user_1.default(name, email, hashedPassword, library, userId);
                             if (user) {
                                 const result = yield (db === null || db === void 0 ? void 0 : db.collection("users").insertOne(user));
                                 res.status(201).json(result);
@@ -98,9 +98,6 @@ router.post('/register', (req, res) => __awaiter(void 0, void 0, void 0, functio
                     else {
                         res.status(409).send('Email already used');
                     }
-                }
-                else {
-                    res.status(401).send('Password not valid');
                 }
             }
             else {

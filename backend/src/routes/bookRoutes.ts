@@ -29,7 +29,8 @@ router.get("/library/:libId/getBook/:bookId/id/:userId", async (req: Request, re
         } else {
             
             const library: LibraryEntry[] = user!.library;
-            const book = getBookfromLibrary(library, libId, bookId);
+            const bookPromise: Promise<BookTuple | null> = getBookfromLibrary(library, libId, bookId);
+            const book: BookTuple | null = await bookPromise;
 
             if(book) {
 
@@ -40,7 +41,43 @@ router.get("/library/:libId/getBook/:bookId/id/:userId", async (req: Request, re
             }
         }
 
-        
+    } catch(error: any) {
+
+        res.status(500).send("Cannot find the book, try again");
+    }
+
+});
+
+//API per dare true se trova il libro
+router.get("/library/:libId/id/:userId/getBook/:bookId", async (req: Request, res: Response) => {
+
+    try {
+
+        const libId: string = req.params.libId;
+        const bookId: string = req.params.bookId;
+        const userId: string = req.params.userId;
+
+        const db = await databaseService.getDb();
+
+        const user = await db?.collection('users').findOne({ _id: new ObjectId(userId) }) as User | null;
+
+        if(!user) {
+
+            res.status(404).send("User not found");
+        } else {
+            
+            const library: LibraryEntry[] = user!.library;
+            const bookPromise: Promise<BookTuple | null> = getBookfromLibrary(library, libId, bookId);
+            const book: BookTuple | null = await bookPromise;
+
+            if(book) {
+                
+                res.status(200).json({result: true});
+            } else {
+
+                res.status(404).send("Book not found");
+            }
+        }
 
     } catch(error: any) {
 

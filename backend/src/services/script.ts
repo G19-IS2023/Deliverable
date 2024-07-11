@@ -69,6 +69,7 @@ export async function getBookfromLibrary(library: LibraryEntry[], libId: string,
   if(!libraryEntry) return null;
 
   const bookTuple = libraryEntry.books.find((book) => book.bookId == bookId) as BookTuple | null;
+
   if(!bookTuple) return null;
 
   return bookTuple;

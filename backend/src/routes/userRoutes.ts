@@ -77,7 +77,7 @@ router.post('/register', async (req: Request, res: Response) => {
         const name: string = req.body.name;
         const email: string = req.body.email;
         const password: string = req.body.password;
-        const predLibrary: LibraryEntry = {libName: "Default", libId: "1", books: []};
+        const predLibrary: LibraryEntry = {libName: "Your Books", libId: "1", books: []};
         const library: LibraryEntry[] = [predLibrary]; //Setta libreria predefinita
         const objectId: string = req.body.userId;
         
@@ -90,7 +90,6 @@ router.post('/register', async (req: Request, res: Response) => {
                     const userId: ObjectId = new ObjectId(objectId);
                     const salt = await bcrypt.genSalt();
                     const hashedPassword = await bcrypt.hash(password, salt) as string;
-                    const user = new User(name, email, hashedPassword, library, userId) as User | null;
                     
                     const db = await databaseService.getDb();
 
@@ -100,29 +99,32 @@ router.post('/register', async (req: Request, res: Response) => {
                     if(!existEmail) {
                         if(!existUsername) {
 
+                            const user = new User(name, email, hashedPassword, library, userId) as User | null;
+
                             if(user) {
+
                             const result = await db?.collection("users").insertOne(user);
 
                             res.status(201).json(result);
-
                             } else {
+
                                 res.status(500).send('User not created due to a database problem');
                             }
                         } else { 
+
                             res.status(409).send('Username already exists');
                         }
                     } else {
+
                         res.status(409).send('Email already used');
                     }
-                } else {
-                    res.status(401).send('Password not valid');
                 }
-                
             } else {
+
                 res.status(406).send('Invalid email');
             }
-    
         } else {
+
             res.status(406).send('Invalid user id');
         }
 

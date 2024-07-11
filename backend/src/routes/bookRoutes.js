@@ -33,9 +33,37 @@ router.get("/library/:libId/getBook/:bookId/id/:userId", (req, res) => __awaiter
         }
         else {
             const library = user.library;
-            const book = (0, script_1.getBookfromLibrary)(library, libId, bookId);
+            const bookPromise = (0, script_1.getBookfromLibrary)(library, libId, bookId);
+            const book = yield bookPromise;
             if (book) {
                 res.status(200).json(book);
+            }
+            else {
+                res.status(404).send("Book not found");
+            }
+        }
+    }
+    catch (error) {
+        res.status(500).send("Cannot find the book, try again");
+    }
+}));
+//API per dare true se trova il libro
+router.get("/library/:libId/id/:userId/getBook/:bookId", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const libId = req.params.libId;
+        const bookId = req.params.bookId;
+        const userId = req.params.userId;
+        const db = yield databaseService.getDb();
+        const user = yield (db === null || db === void 0 ? void 0 : db.collection('users').findOne({ _id: new mongodb_1.ObjectId(userId) }));
+        if (!user) {
+            res.status(404).send("User not found");
+        }
+        else {
+            const library = user.library;
+            const bookPromise = (0, script_1.getBookfromLibrary)(library, libId, bookId);
+            const book = yield bookPromise;
+            if (book) {
+                res.status(200).json({ result: true });
             }
             else {
                 res.status(404).send("Book not found");
