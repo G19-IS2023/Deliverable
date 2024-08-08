@@ -181,20 +181,20 @@ function UserSettings() {
                 className="bottoni-user"
                 onClick={() => handleShow("username")}
               >
-                Modifica Username
+                Change Username
               </Button>
               <Button
                 className="bottoni-user"
                 onClick={() => handleShow("password")}
               >
-                Modifica Password
+                Change Password
               </Button>
               <Button
                 className="bottone-user-delete"
                 variant="danger"
                 onClick={handleDeleteShow}
               >
-                Elimina Account
+                Delete Account
               </Button>
             </div>
           ) : (

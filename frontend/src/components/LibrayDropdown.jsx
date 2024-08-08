@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import { Dropdown, DropdownButton } from "react-bootstrap";
+import "./librarydropdown.css";
 
 const LibraryDropdown = ({ bookId }) => {
   const [libraries, setLibraries] = useState([]);
@@ -17,7 +18,7 @@ const LibraryDropdown = ({ bookId }) => {
     fetch(`http://localhost:5050/book/getLibraries/${userId}`)
       .then((response) => {
         if (!response.ok) {
-          throw new Error('Failed to fetch libraries');
+          throw new Error("Failed to fetch libraries");
         }
         return response.json();
       })
@@ -44,7 +45,7 @@ const LibraryDropdown = ({ bookId }) => {
                 if (contentType && contentType.includes("application/json")) {
                   return res.json();
                 } else {
-                  return res.text().then(text => {
+                  return res.text().then((text) => {
                     throw new Error(text);
                   });
                 }
@@ -116,15 +117,20 @@ const LibraryDropdown = ({ bookId }) => {
   };
 
   return (
-    <DropdownButton id="dropdown-basic-button" title="Librerie">
+    <DropdownButton
+      id="dropdown-basic-button"
+      title="Libraries"
+      className="button-drop"
+    >
       {libraries.map((library) => (
         <Dropdown.Item
           key={library.libId}
           onClick={() => handleLibraryClick(library.libId)}
           style={{
             backgroundColor: bookInLibraries[library.libId]
-              ? "lightgreen"
+              ? "#0c929e"
               : "white",
+            color: bookInLibraries[library.libId] ? "white" : "#0c929e",
           }}
         >
           {library.libName}
@@ -139,4 +145,3 @@ LibraryDropdown.propTypes = {
 };
 
 export default LibraryDropdown;
-
