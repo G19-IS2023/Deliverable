@@ -11,12 +11,12 @@
 }
 
 .container_titolo_fullpage{
-  padding: 40px !important;
-  display: flex !important;
-  justify-content: center !important;
-  align-items: center !important;
-  background-color: #0c929e !important;
-  margin: 80px 0px 40px 0px !important;
+  padding: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #0c929e;
+  margin: 80px 0px 40px 0px;
 }
 .titolo_fullpage{
   margin: 0;

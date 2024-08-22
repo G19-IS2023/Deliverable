@@ -1,12 +1,10 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
 import Navbar from 'react-bootstrap/Navbar';
 import Offcanvas from 'react-bootstrap/Offcanvas';
 import { Link } from 'react-router-dom';
 import { Col, Row } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './nav_and_offcanvas.css';
-import { useNavigate } from "react-router-dom";
 
 function NavbarAndOffcanvas() {
   const [show, setShow] = useState(false);
@@ -15,8 +13,6 @@ function NavbarAndOffcanvas() {
     email: 'guest@example.com',
   });
   const [userId, setUserId] = useState(localStorage.getItem('userId'));
-  const [search, setSearch] = useState('');
-  const navigate = useNavigate();
 
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
@@ -69,33 +65,6 @@ function NavbarAndOffcanvas() {
       window.removeEventListener('storage', handleStorageChange);
     };
   }, [userId]);  // Riesegui l'effect quando userId cambia
-
-  const handleSearchChange = (e) => {
-    setSearch(e.target.value);
-  };
-
-  const handleSearch = async (e) => {
-    e.preventDefault();  // Prevenire il comportamento predefinito del form
-    try {
-      const res = await axios.get(`https://example-data.draftbit.com/books?q=${search}`);
-      const books = res.data;
-      navigate(`/books/full/${search}`, {
-        state: {
-          books,
-          title: `Results for: '${search}'`,
-        },
-      });
-    } catch (err) {
-      console.error(err);
-    }
-    setSearch('');
-  };
-
-  const handleLogout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('userId');
-  };
-
   return (
     <div>
       <div>
@@ -113,25 +82,11 @@ function NavbarAndOffcanvas() {
                 <p>{user.email}</p>
               </div>
               <div>
-                <Link className="box_opzioni2" to="/home">
+                <Link className="box_opzioni2" to="/userLibrary">
                   <div className="opzione">
                     <hr className="riga" />
                   </div>
-                  <div className={location.pathname === '/home' ? 'activeb ' : 'preview'}>
-                    <div className="box_opzioni">
-                      <img className="icone" alt="icon" />
-                      <h4 className="opzioni">Home</h4>
-                    </div>
-                    <img className="freccia" alt="arrow" />
-                  </div>
-                </Link>
-              </div>
-              <div>
-                <Link className="box_opzioni2" to="/userLibrary" >
-                  <div className="opzione">
-                    <hr className="riga" />
-                  </div>
-                  <div className={location.pathname === '/userLibrary' ? 'activeb ' : 'preview'}>
+                  <div className="preview">
                     <div className="box_opzioni">
                       <img className="icone" alt="icon" />
                       <h4 className="opzioni">My Library</h4>
@@ -140,13 +95,26 @@ function NavbarAndOffcanvas() {
                   </div>
                 </Link>
               </div>
-              
               <div>
-                <Link className="box_opzioni2" to="/userSettings" user={user}>
+                <Link className="box_opzioni2" to="/">
                   <div className="opzione">
                     <hr className="riga" />
                   </div>
-                  <div className={location.pathname === '/userSettings' ? 'activeb ' : 'preview'}>
+                  <div className="preview">
+                    <div className="box_opzioni">
+                      <img className="icone" alt="icon" />
+                      <h4 className="opzioni">Wish List</h4>
+                    </div>
+                    <img className="freccia" alt="arrow" />
+                  </div>
+                </Link>
+              </div>
+              <div>
+                <Link className="box_opzioni2" to="/userSettings">
+                  <div className="opzione">
+                    <hr className="riga" />
+                  </div>
+                  <div className="preview">
                     <div className="box_opzioni">
                       <img className="icone" alt="icon" />
                       <h4 className="opzioni">User settings</h4>
@@ -156,7 +124,7 @@ function NavbarAndOffcanvas() {
                 </Link>
               </div>
               <div>
-                <Link className="box_opzioni2" to="/" onClick={handleLogout}>
+                <Link className="box_opzioni2" to="/">
                   <div className="opzione">
                     <hr className="riga" />
                   </div>
@@ -188,33 +156,26 @@ function NavbarAndOffcanvas() {
             </Col>
             <Col md={8}>
               <div className="ricerca">
-                <form onSubmit={handleSearch}>
-                  <input
-                    type="text"
-                    placeholder="Search"
-                    className="search_input"
-                    value={search}
-                    onChange={handleSearchChange}
-                  />
-                </form>
+                <input
+                  type="text"
+                  placeholder="Search"
+                  className="search_input"
+                ></input>
                 <div>
                   <img
                     src="/src/assets/icona_ricerca.png"
                     className="search_icon"
                     alt="Search"
-                    onClick={handleSearch}
                   />
                 </div>
               </div>
             </Col>
             <Col md={2} className="right-col">
-              <Link to="/home">
-                <img
-                  src="/src/assets/logo_intero.png"
-                  className="logo_intero"
-                  alt="Logo"
-                />
-              </Link>
+              <img
+                src="/src/assets/logo_intero.png"
+                className="logo_intero"
+                alt="Logo"
+              />
             </Col>
           </Row>
         </Navbar>

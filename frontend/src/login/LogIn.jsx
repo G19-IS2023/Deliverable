@@ -1,6 +1,7 @@
 /* eslint-disable react/no-unescaped-entities */
 /* eslint-disable no-unused-vars */
 import React, {useState} from 'react'
+import { useUser } from '../context/UserContext';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import { Link, useNavigate } from "react-router-dom";
@@ -11,6 +12,8 @@ import axios from 'axios'
 function LogIn() {
 
   const [validated, setValidated] = useState(false);
+
+  const { setUser } = useUser();
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -27,10 +30,9 @@ function LogIn() {
     try {
       const response = await axios.post('http://localhost:5050/user/login', { email, password });
       if (response.status === 200) {
-        const userId = response.data.userId;
-        const accessToken = response.headers['authorization'].split(' ')[1];
-        localStorage.setItem('token', `${accessToken}`); // Salva accessToken nel localStorage
-        localStorage.setItem('userId', `${userId}`);  // Salva l'ID utente nel localStorage
+        const {accesToken, userId} = response.data;
+        localStorage.setItem('token', accesToken);
+        localStorage.setItem('userId', userId);  // Salva l'ID utente nel localStorage
         window.location.href = '/home';
       } else {
         throw new Error('Login failed');
@@ -68,8 +70,13 @@ function LogIn() {
               Please choose a valid password.
               </Form.Control.Feedback>
             </Form.Group>
+            <Form.Group className="mb-3" controlId="formBasicCheckbox">
+              <Form.Check className='quicksand-normal' type="checkbox" label="Remember me"/>
+            </Form.Group>
             <div className='div-login-button'>
             <Button type="submit" className='login-button temp'> Log In
+              {//<Link to='/home' className='temp'>Log in</Link>
+}
             </Button>
             <Link className="register-link quicksand-light" to="/register" style={{cursor:"pointer"}}>
             I don't have an account!

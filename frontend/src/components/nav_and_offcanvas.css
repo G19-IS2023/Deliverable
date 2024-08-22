@@ -154,40 +154,6 @@ input:focus {
 .preview:hover img.icone {
   content: url(/src/assets/logout_blu.png);
 }
-
-.activeb{
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  text-decoration: none;
-  padding: 0.7rem 0;
-  background-color: #15e0f3;
-}
-.activeb img.icone{
-  height: 2rem;
-  margin-right: 1rem;
-  border: none;
-  background-position: center;
-  background-repeat: no-repeat;
-  background-size: cover;
-  background-attachment: fixed;
-  content: url(/src/assets/logout_blu.png);
-}
-.activeb img.freccia{
-  height: 1rem;
-  margin-bottom: 5px;
-  margin-right: 1rem;
-  width: 1rem;
-  border: none;
-  background-position: center;
-  background-repeat: no-repeat;
-  background-size: cover;
-  background-attachment: fixed;
-  content: url(/src/assets/arrow_blu.png);
-}
-.activeb h4.opzioni{
-  color: #0c929e;
-}
 .offcanvas-body {
   padding-left: 0;
   padding-right: 0;
