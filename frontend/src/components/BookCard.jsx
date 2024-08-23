@@ -16,7 +16,7 @@ function BookCard(props) {
         navigate(`/books/${item.id}`)}
       />
       <Card.Body className="card_body">
-        <Card.Title>{item.title}</Card.Title>
+        <Card.Title className="card-title">{item.title}</Card.Title>
         <p>{item.authors}</p>
       </Card.Body>
     </Card>
