@@ -92,7 +92,7 @@ function UserSettings() {
         `http://localhost:5050/user/deleteProfile/${userId}`,
         {
           headers: {
-            Authorization: `Bearer ${token}`,
+            Authorization: `${token}`,
           },
         }
       );
@@ -118,7 +118,7 @@ function UserSettings() {
         },
         {
           headers: {
-            Authorization: `Bearer ${token}`,
+            Authorization: `${token}`,
           },
         }
       );
@@ -143,7 +143,7 @@ function UserSettings() {
         },
         {
           headers: {
-            Authorization: `Bearer ${token}`,
+            Authorization: `${token}`,
           },
         }
       );
