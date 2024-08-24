@@ -7,7 +7,6 @@ import { bookRouter } from './routes/bookRoutes';
 dotenv.config({path: '../.env'});
 
 const app = express();
-const PORT = process.env.PORT || 5050;
 
 const corsOptions = {
     origin: '*',
@@ -20,9 +19,8 @@ app.use(cors(corsOptions));
 app.options('*', cors(corsOptions));
 
 app.use(express.json());
+
 app.use('/user', userRouter);
 app.use('/book', bookRouter);
 
-app.listen(PORT, () => {
-    console.log(`Server running on port: ${PORT}`);
-});
+export default app;

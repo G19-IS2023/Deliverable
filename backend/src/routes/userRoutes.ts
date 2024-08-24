@@ -20,12 +20,18 @@ router.get('/getUser/:userId', async(req: Request, res: Response) => {
         const db = await databaseService.getDb();
         const userId: string = req.params.userId;
 
-        const user = await db?.collection("users").findOne( { _id: new ObjectId(userId) } ) as User | null;
+        if(ObjectId.isValid(userId)) {
         
-        if(user) {
-            res.status(200).json(user);
+            const user = await db?.collection("users").findOne( { _id: new ObjectId(userId) } ) as User | null;
+        
+            if(user) {
+                res.status(200).json(user);
+            } else {
+                res.status(404).send("User not found");
+            }
+
         } else {
-            res.status(404).send("User not found");
+            res.status(406).send("Invalid user id");
         }
 
     }catch(error: any) {
@@ -55,13 +61,14 @@ router.post('/login', async(req: Request, res: Response) => {
 
             const accessToken = jwt.sign({ email: possibleUser.email, _id: possibleUser._id }, process.env.ACCESS_TOKEN_SECRET!);
 
-            res.set('Authorization', `Bearer ${accessToken}`);
+            res.set('Authorization', `${accessToken}`);
             res.status(200).json({ userId: possibleUser._id });
 
         } else {
             
             res.status(401).send('Wrong password');
         }
+
     } catch (error: any) {
 
         res.status(500).send('Unable to login, try again');
@@ -103,9 +110,9 @@ router.post('/register', async (req: Request, res: Response) => {
 
                             if(user) {
 
-                            const result = await db?.collection("users").insertOne(user);
+                                const result = await db?.collection("users").insertOne(user);
 
-                            res.status(201).json(result);
+                                res.status(201).json(result);
                             } else {
 
                                 res.status(500).send('User not created due to a database problem');
@@ -143,17 +150,31 @@ router.put('/modifyUsername', verifyToken, async (req: Request, res: Response) =
         const userId: string = req.body.userId;
         const newUsername: string = req.body.newUsername;
 
-        const db = await databaseService.getDb();
+        if(ObjectId.isValid(userId)) {
+            
+            const db = await databaseService.getDb();
 
-        const existUsername = await db?.collection('users').findOne({ name: newUsername  }) as User | null;
+            const user = await db?.collection("users").findOne({ _id: new ObjectId(userId) });
 
-        if(!existUsername){
+            if(user) {
 
-            await db?.collection('users').updateOne({ _id: new ObjectId(userId) }, { $set: { name: newUsername } });
-            res.status(200).send('Succesfully updated');
+                const existUsername = await db?.collection('users').findOne({ name: newUsername  }) as User | null;
+
+                if(!existUsername){
+    
+                    await db?.collection('users').updateOne({ _id: new ObjectId(userId) }, { $set: { name: newUsername } });
+                    res.status(200).send('Succesfully updated');
+                } else {
+    
+                    res.status(409).send('Username already exist');
+                }
+            } else {
+
+                res.status(404).send('Cannot find user');
+            }
+
         } else {
-
-            res.status(409).send("Username already exist");
+            res.status(406).send('Invalid user id');
         }
             
     } catch(error: any) {
@@ -173,32 +194,38 @@ router.put('/modifyPassword', verifyToken, async (req: Request, res: Response) =
         
         const newPassword: string = req.body.newPassword;
 
-        const db = await databaseService.getDb();
-        const user = await db?.collection("users").findOne({ _id: new ObjectId(userId) }) as User | null;
+        if(ObjectId.isValid(userId)) {
 
-        if(!user) {
-            res.status(404).send('Cannot find the user');
-        } else {
-            if(validatePassword(newPassword, req, res)) {
+            const db = await databaseService.getDb();
+            const user = await db?.collection("users").findOne({ _id: new ObjectId(userId) }) as User | null;
+    
+            if(!user) {
 
-                if(await bcrypt.compare(oldPassword, user!.password)) {
-
-                    const salt = await bcrypt.genSalt();
-                    const hashedPassword = await bcrypt.hash(newPassword, salt);
-
-                    await db?.collection("users").updateOne({ _id: new ObjectId(userId) }, { $set: { password: hashedPassword } });
-
-                    res.status(200).send('Succesfully updated');
-                } else {
-                    
-                    res.status(401).send('Old password is incorrect');
-                }
+                res.status(404).send('Cannot find the user');
 
             } else {
-                res.status(406).send('New password is not valid');
-            }
-        }
 
+                if(validatePassword(newPassword, req, res)) {
+    
+                    if(await bcrypt.compare(oldPassword, user!.password)) {
+    
+                        const salt = await bcrypt.genSalt();
+                        const hashedPassword = await bcrypt.hash(newPassword, salt);
+    
+                        await db?.collection("users").updateOne({ _id: new ObjectId(userId) }, { $set: { password: hashedPassword } });
+    
+                        res.status(200).send('Succesfully updated');
+
+                    } else {
+                        
+                        res.status(401).send('Old password is incorrect');
+                    }
+                }
+            }
+
+        } else {
+            res.status(406).send('Invalid user id');
+        }
     } catch(error: any) {
 
         res.status(500).send("Unable to update the password, try again");
@@ -213,16 +240,26 @@ router.delete("/deleteProfile/:userId", verifyToken, async (req: Request, res: R
 
         const userId: string = req.params.userId;
 
-        const db = await databaseService.getDb();
-        const user = await db?.collection("users").findOne( { _id: new ObjectId(userId) } ) as User | null;
+        if(ObjectId.isValid(userId)) {
 
-        if(!user) {
-            res.status(404).send('Cannot find user');
-            return;
+            const db = await databaseService.getDb();
+            const user = await db?.collection("users").findOne( { _id: new ObjectId(userId) } ) as User | null;
+    
+            if(!user) {
+
+                res.status(404).send('Cannot find user');
+                return;
+
+            } else {
+    
+                await db?.collection('users').deleteOne({ _id: new ObjectId(userId) });
+                res.status(200).send('Succesfully deleted');
+            }
+            
         } else {
 
-            await db?.collection('users').deleteOne({ _id: new ObjectId(userId) });
-            res.status(200).send('Succesfully deleted');
+            res.status(406).send('Invalid user id');
+            
         }
 
     } catch(error: any) {
@@ -230,5 +267,6 @@ router.delete("/deleteProfile/:userId", verifyToken, async (req: Request, res: R
         res.status(500).send("Unable to delete the account, try again");
     }
 });
+
 
 export { router as userRouter };

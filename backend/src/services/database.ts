@@ -31,4 +31,17 @@ export class DatabaseService {
         }
         return this.db;
     }
+
+    public setDB(db: Db) {
+        this.db = db;
+    }
+
+    public getClient(): MongoClient | undefined {
+        return this.client;
+    }
+
+    public setClient(client: MongoClient) {
+        this.client = client;
+    }
+
 }

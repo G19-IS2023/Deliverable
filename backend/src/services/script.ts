@@ -4,57 +4,60 @@ import LibraryEntry from '../models/library';
 import BookTuple from '../models/book';
 
 export const verifyToken = (req: Request, res: Response, next: NextFunction) => {
+
   const authHeader = req.headers.authorization;
+
   if (!authHeader) {
-    return res.status(401).send({ error: 'Unauthorized: No token provided' });
+
+    return res.status(401).send('Unauthorized: No token provided');
   }
 
-  const token = authHeader.split(' ')[1]; // Assumes "Bearer <token>" format
-  if (!token) {
-    return res.status(401).send({ error: 'Unauthorized: Malformed token' });
-  }
+  const token = authHeader;
 
-  jwt.verify(token, process.env.ACCESS_TOKEN_SECRET!, (err, decoded) => {
+  jwt.verify(token, process.env.ACCESS_TOKEN_SECRET!, (err) => {
+
     if (err) {
-      return res.status(401).send({ error: 'Unauthorized: Invalid token' });
+
+      return res.status(401).send('Unauthorized: Invalid token');
     }
 
-    // Store the decoded user info in res.locals for use in your route handlers
-    res.locals.user = decoded;
     next();
   });
 };
 
+
 export function validateEmail (email: string): boolean {
 
-  var re =
+  var reg =
     /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
  
-  return re.test(String(email).toLowerCase());
+  return reg.test(String(email).toLowerCase());
 }
 
+
 export function validatePassword(password: string, req: Request, res: Response): boolean {
+  
   // Verifica la lunghezza minima di 8 caratteri
   if (password.length < 8) {
-      res.status(400).send("La password deve essere di almeno 8 caratteri.");
+      res.status(406).send("The password must be 8 char long");
       return false;
   }
 
   // Verifica la presenza di almeno una lettera
   if (!/[a-zA-Z]/.test(password)) {
-      res.status(400).send("La password deve contenere almeno una lettera.");
+      res.status(406).send("The password must contain a letter");
       return false;
   }
 
   // Verifica la presenza di almeno un numero
   if (!/\d/.test(password)) {
-      res.status(400).send("La password deve contenere almeno un numero.");
+      res.status(406).send("The password must contain a number");
       return false;
   }
 
   // Verifica la presenza di almeno un carattere speciale tra i seguenti: ? ! . _ - @ |
   if (!/[?!._\-@|]/.test(password)) {
-      res.status(400).send("La password deve contenere almeno uno dei seguenti caratteri speciali: ? ! . _ - @ |");
+      res.status(406).send("The password must contain at least one special char between these: ? ! . _ - @ |");
       return false;
   }
 

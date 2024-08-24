@@ -29,8 +29,7 @@ router.get("/library/:libId/getBook/:bookId/id/:userId", async (req: Request, re
         } else {
             
             const library: LibraryEntry[] = user!.library;
-            const bookPromise: Promise<BookTuple | null> = getBookfromLibrary(library, libId, bookId);
-            const book: BookTuple | null = await bookPromise;
+            const book: BookTuple | null = await getBookfromLibrary(library, libId, bookId);
 
             if(book) {
 
@@ -67,8 +66,7 @@ router.get("/library/:libId/id/:userId/getBook/:bookId", async (req: Request, re
         } else {
             
             const library: LibraryEntry[] = user!.library;
-            const bookPromise: Promise<BookTuple | null> = getBookfromLibrary(library, libId, bookId);
-            const book: BookTuple | null = await bookPromise;
+            const book:BookTuple | null = await getBookfromLibrary(library, libId, bookId);
 
             if(book) {
                 
@@ -141,9 +139,9 @@ router.get("/getLibraries/:userId", async (req: Request, res: Response) => {
             res.status(404).send("User not found");
         } else {
 
-            const library: LibraryEntry[] = user!.library;
-        
-            res.status(200).json(library);
+            const libraries: LibraryEntry[] = user!.library;
+            
+            res.status(200).json(libraries);
         }
 
     } catch(error: any) {
@@ -172,16 +170,24 @@ router.put("/modifyPages", async(req: Request, res: Response) => {
         } else {
 
             const library: LibraryEntry[] = user!.library;
+            let libraryPresence: boolean = false;
 
             library.forEach((lib) => {
                 if(lib.libId == libId) lib.books.forEach((book) => {
+                    libraryPresence = true;
                     if(book.bookId == bookId) book.pagesRead = pages;
                 });
             });
 
-            await db?.collection('users').updateOne( { _id: new ObjectId(userId) }, { $set: { library: library } } );
+            if(libraryPresence) {
 
-            res.status(200).send("Number of pages read updated");
+                await db?.collection('users').updateOne( { _id: new ObjectId(userId) }, { $set: { library: library } } );
+
+                res.status(200).send("Number of pages read updated");
+            } else {
+
+                res.status(404).send("The library where you want to modify the book doesn't exist");
+            }
         }
 
     } catch(error: any) {
@@ -213,7 +219,7 @@ router.post("/createLibrary", async (req: Request, res: Response) => {
             
             await db?.collection("users").updateOne( { _id: new ObjectId(userId) }, { $set: { library: library } } );
 
-            res.status(200).send(`Library: ${libName} created`);
+            res.status(200).send(`Library "${libName}" created`);
         } else {
 
             res.status(404).send("User not found");
@@ -242,16 +248,25 @@ router.post("/addBook", async(req: Request, res: Response) => {
         if(user) {
 
             const library: LibraryEntry[] = user.library;
+            let libraryPresence: boolean = false;
 
             library.forEach((lib) => {
                 if(lib.libId === libId) {
+                    libraryPresence = true;
                     lib.books.push(newBook);
                 }
             });
 
-            await db?.collection("users").updateOne({ _id: new ObjectId(userId) }, { $set: { library: library } });
+            if(libraryPresence) {
 
-            res.status(200).send("Book added with success");
+                await db?.collection("users").updateOne({ _id: new ObjectId(userId) }, { $set: { library: library } });
+
+                res.status(200).send("Book added with success");
+            } else {
+
+                res.status(404).send("The library where you want to add the book dosen't exist");
+            }
+
         } else {
 
             res.status(404).send("User not found");
@@ -281,17 +296,25 @@ router.delete("/library/:libId/deleteBook/:bookId/id/:userId", async (req: Reque
         if(user) {
 
             const library: LibraryEntry[] = user.library;
+            let libraryPresence: boolean = false;
 
             library.forEach((lib) => {
 
                 if(lib.libId === libId) {
+                    libraryPresence = true;
                     lib.books = lib.books.filter((book) => book.bookId !== bookId) as BookTuple[];
                 }
             });
 
-            await db?.collection("users").updateOne( { _id: new ObjectId(userId) }, {$set: { library: library}});
+            if(libraryPresence) {
 
-            res.status(200).send(`Book deleted with success`);
+                await db?.collection("users").updateOne( { _id: new ObjectId(userId) }, {$set: { library: library}});
+
+                res.status(200).send(`Book deleted with success`);
+            } else {
+                res.status(404).send("The library where you want to delete the book doesn't exist");
+            }
+
         } else {
 
             res.status(404).send("User not found");
@@ -318,14 +341,21 @@ router.delete("/deleteLibrary/:libId/id/:userId", async (req: Request, res: Resp
         if(user) {
 
             const library: LibraryEntry[] = user.library;
-
+            
             const updateLibrary = library.filter((lib) => {
                 return lib.libId !== libId;
             }) as LibraryEntry[];
 
-            await db?.collection("users").updateOne({ _id: new ObjectId(userId) }, {  $set: { library: updateLibrary }});
+            if(library.length !== updateLibrary.length) {
 
-            res.status(200).send(`Library: ${libId} deleted with success`);
+                await db?.collection("users").updateOne({ _id: new ObjectId(userId) }, {  $set: { library: updateLibrary }});
+
+                res.status(200).send(`Library "${libId}" deleted with success`);
+            } else {
+
+                res.status(404).send("The library that you want to delete doesn't exist");
+            }
+
         } else {
 
             res.status(404).send("User not found");
