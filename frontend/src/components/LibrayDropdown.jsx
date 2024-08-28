@@ -6,7 +6,7 @@ import "./librarydropdown.css";
 const LibraryDropdown = ({ bookId, isInLib }) => {
   const [libraries, setLibraries] = useState([]);
   const [bookInLibraries, setBookInLibraries] = useState({});
-  const userId = localStorage.getItem("userId");
+  const userId = sessionStorage.getItem("userId");
 
   useEffect(() => {
     if (isInLib) {
@@ -20,7 +20,7 @@ const LibraryDropdown = ({ bookId, isInLib }) => {
 
   useEffect(() => {
     if (!userId) {
-      console.error("User ID is not available in localStorage.");
+      console.error("User ID is not available in sessionStorage.");
       return;
     }
 

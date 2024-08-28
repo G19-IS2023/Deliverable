@@ -14,7 +14,7 @@ function NavbarAndOffcanvas() {
     name: 'Guest',
     email: 'guest@example.com',
   });
-  const [userId, setUserId] = useState(localStorage.getItem('userId'));
+  const [userId, setUserId] = useState(sessionStorage.getItem('userId'));
   const [search, setSearch] = useState('');
   const navigate = useNavigate();
 
@@ -47,7 +47,7 @@ function NavbarAndOffcanvas() {
           });
         }
       } else {
-        console.error('No userId found in localStorage, setting default guest values.');
+        console.error('No userId found in sessionStorage, setting default guest values.');
         setUser({
           name: 'Guest',
           email: 'guest@example.com'
@@ -94,8 +94,8 @@ function NavbarAndOffcanvas() {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('userId');
+    sessionStorage.removeItem('token');
+    sessionStorage.removeItem('userId');
   };
 
   return (

@@ -17,7 +17,7 @@ function UserSettings() {
     name: "Guest",
     email: "guest@example.com",
   });
-  const [userId, setUserId] = useState(localStorage.getItem("userId"));
+  const [userId, setUserId] = useState(sessionStorage.getItem("userId"));
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -51,7 +51,7 @@ function UserSettings() {
         }
       } else {
         console.error(
-          "No userId found in localStorage, setting default guest values."
+          "No userId found in sessionStorage, setting default guest values."
         );
         setUser({
           name: "Guest",
@@ -86,8 +86,8 @@ function UserSettings() {
 
   const handleDeleteAccount = async () => {
     try {
-      const token = localStorage.getItem("token");
-      const userId = localStorage.getItem("userId");
+      const token = sessionStorage.getItem("token");
+      const userId = sessionStorage.getItem("userId");
       await axios.delete(
         `http://localhost:5050/user/deleteProfile/${userId}`,
         {
@@ -96,8 +96,8 @@ function UserSettings() {
           },
         }
       );
-      localStorage.removeItem("token");
-      localStorage.removeItem("userId");
+      sessionStorage.removeItem("token");
+      sessionStorage.removeItem("userId");
       setShowDelete(false);
       window.location.href = "/";
     } catch (error) {
@@ -108,8 +108,8 @@ function UserSettings() {
   const handleUsernameSubmit = async (e) => {
     e.preventDefault();
     try {
-      const token = localStorage.getItem("token");
-      const userId = localStorage.getItem("userId");
+      const token = sessionStorage.getItem("token");
+      const userId = sessionStorage.getItem("userId");
       await axios.put(
         "http://localhost:5050/user/modifyUsername",
         {
@@ -132,8 +132,8 @@ function UserSettings() {
   const handlePasswordSubmit = async (e) => {
     e.preventDefault();
     try {
-      const token = localStorage.getItem("token");
-      const userId = localStorage.getItem("userId");
+      const token = sessionStorage.getItem("token");
+      const userId = sessionStorage.getItem("userId");
       await axios.put(
         "http://localhost:5050/user/modifyPassword",
         {

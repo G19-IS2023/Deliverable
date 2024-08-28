@@ -34,7 +34,7 @@ const LibraryList = () => {
       alert("The 'Your Books' library cannot be deleted.");
       return;
     }
-    const userId = localStorage.getItem("userId");
+    const userId = sessionStorage.getItem("userId");
     const response = await fetch(`http://localhost:5050/book/deleteLibrary/${selectedLibraryId}/id/${userId}`, {
       method: 'DELETE'
     });
@@ -52,7 +52,7 @@ const LibraryList = () => {
   };
 
   useEffect(() => {
-    const userId = localStorage.getItem("userId");
+    const userId = sessionStorage.getItem("userId");
 
     fetch(`http://localhost:5050/book/getLibraries/${userId}`)
       .then((response) => response.json())
@@ -111,7 +111,7 @@ const LibraryList = () => {
 
   const handleFormSubmit = async (event) => {
     event.preventDefault();
-    const userId = localStorage.getItem("userId");
+    const userId = sessionStorage.getItem("userId");
     const newLibId = `lib-${Date.now()}`; // Generate a unique ID for the library
     try {
       const response = await fetch('http://localhost:5050/book/createLibrary', {

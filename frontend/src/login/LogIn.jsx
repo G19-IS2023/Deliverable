@@ -29,8 +29,8 @@ function LogIn() {
       if (response.status === 200) {
         const userId = response.data.userId;
         const accessToken = response.headers['authorization'];
-        localStorage.setItem('token', `${accessToken}`); // Salva accessToken nel localStorage
-        localStorage.setItem('userId', `${userId}`);  // Salva l'ID utente nel localStorage
+        sessionStorage.setItem('token', `${accessToken}`); // Salva accessToken nel sessionStorage
+        sessionStorage.setItem('userId', `${userId}`);  // Salva l'ID utente nel sessionStorage
         window.location.href = '/home';
       } else {
         throw new Error('Login failed');

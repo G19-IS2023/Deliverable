@@ -14,7 +14,7 @@ function BookDetails() {
   const [readPages, setReadPages] = useState(0);
   const [debouncedReadPages, setDebouncedReadPages] = useState(readPages); // Debounced value
   const [isInLib, setIsInLib] = useState(false); // Stato per verificare se il libro è in una libreria
-  const userId = localStorage.getItem("userId"); // Fetch the user ID from localStorage
+  const userId = sessionStorage.getItem("userId"); // Fetch the user ID from sessionStorage
   const incrementInterval = useRef(null);
   const decrementInterval = useRef(null);
   const prevReadPages = useRef(0); // Reference to track changes in readPages for API update
